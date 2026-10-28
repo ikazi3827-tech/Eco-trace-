@@ -1,0 +1,713 @@
+
+import 'package:flutter/material.dart';
+
+void main() => runApp(const EcoTraceApp());
+
+const cream = Color(0xFFFFFCF3);
+const cardColor = Color(0xFFFFFEFA);
+const blue = Color(0xFF087DE0);
+const navy = Color(0xFF123A67);
+const green = Color(0xFF159B78);
+const muted = Color(0xFF718397);
+const borderColor = Color(0xFFDCE7E9);
+
+class EcoTraceApp extends StatelessWidget {
+  const EcoTraceApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'EcoTrace',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: cream,
+        colorScheme: ColorScheme.fromSeed(seedColor: blue),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: cream,
+          foregroundColor: navy,
+        ),
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int selected = 0;
+
+  final titles = const [
+    'Dashboard',
+    'Eco-Swaps',
+    'Community',
+    'Profile',
+  ];
+
+  void message(String text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = [
+      DashboardPage(onSwaps: () => setState(() => selected = 1)),
+      const SwapsPage(),
+      const CommunityPage(),
+      const ProfilePage(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Container(
+              height: 42,
+              width: 42,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF43D3D4), blue],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.eco_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'EcoTrace',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 24,
+                color: navy,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => message('You are all caught up! 🌱'),
+            icon: const Icon(Icons.notifications_none_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, color: borderColor),
+        ),
+      ),
+      body: SafeArea(
+        child: IndexedStack(
+          index: selected,
+          children: pages,
+        ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selected,
+        onDestinationSelected: (i) => setState(() => selected = i),
+        backgroundColor: cardColor,
+        indicatorColor: const Color(0xFFDCEEFF),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
+            label: 'Dashboard',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.eco_outlined),
+            selectedIcon: Icon(Icons.eco_rounded),
+            label: 'Eco-Swaps',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.groups_outlined),
+            selectedIcon: Icon(Icons.groups_rounded),
+            label: 'Community',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline_rounded),
+            selectedIcon: Icon(Icons.person_rounded),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// REUSABLE UI COMPONENTS
+
+class Panel extends StatelessWidget {
+  final Widget child;
+  final EdgeInsets padding;
+
+  const Panel({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: navy.withOpacity(0.035),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class PageTitle extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const PageTitle(this.title, this.subtitle, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: navy,
+              fontSize: 25,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(subtitle, style: const TextStyle(color: muted)),
+        ],
+      ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+  const SectionTitle(this.title, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: navy,
+          fontSize: 17,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class AppFooter extends StatelessWidget {
+  const AppFooter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Text(
+          'Design by Kazi Shujauddin',
+          style: TextStyle(
+            color: muted,
+            fontSize: 11,
+            letterSpacing: 0.4,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// 1. DASHBOARD
+
+class DashboardPage extends StatelessWidget {
+  final VoidCallback onSwaps;
+
+  const DashboardPage({super.key, required this.onSwaps});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text(
+          'Good morning,',
+          style: TextStyle(color: navy, fontSize: 16),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Kazi Shujauddin 🌿',
+          style: TextStyle(
+            color: navy,
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 5),
+        const Text(
+          'Small steps today, a greener tomorrow!',
+          style: TextStyle(color: muted, fontSize: 12),
+        ),
+        const SizedBox(height: 20),
+
+        // Carbon footprint card
+        Panel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Today's Carbon Footprint",
+                style: TextStyle(
+                  color: navy,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(
+                    height: 125,
+                    width: 125,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 125,
+                          width: 125,
+                          child: CircularProgressIndicator(
+                            value: 4.2 / 8,
+                            strokeWidth: 11,
+                            strokeCap: StrokeCap.round,
+                            backgroundColor: const Color(0xFFE5EFF2),
+                            valueColor:
+                                const AlwaysStoppedAnimation(blue),
+                          ),
+                        ),
+                        const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.eco, color: green, size: 22),
+                            Text(
+                              '4.2 kg',
+                              style: TextStyle(
+                                color: navy,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              'of 8 kg CO₂',
+                              style: TextStyle(
+                                color: muted,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Daily Target',
+                          style: TextStyle(color: muted, fontSize: 12),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          '8 kg CO₂',
+                          style: TextStyle(
+                            color: navy,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        LinearProgressIndicator(
+                          value: 0.525,
+                          minHeight: 8,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                          backgroundColor: Color(0xFFE5EFF2),
+                          valueColor: AlwaysStoppedAnimation(blue),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          '✓ You are on track!',
+                          style: TextStyle(
+                            color: green,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 15),
+
+        // Three quick stats
+        const Row(
+          children: [
+            Expanded(
+              child: StatCard(
+                icon: Icons.eco,
+                color: green,
+                title: 'CO₂ Saved',
+                value: '12.6 kg',
+                foot: '+18% this week',
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: StatCard(
+                icon: Icons.water_drop,
+                color: blue,
+                title: 'Plastic Reduced',
+                value: '8.4 kg',
+                foot: '+12% this week',
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: StatCard(
+                icon: Icons.star_rounded,
+                color: Color(0xFFEBA32A),
+                title: 'Green Score',
+                value: '78/100',
+                foot: '+6 points',
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 15),
+        const SectionTitle('Recent Transactions'),
+
+        const TransactionCard(
+          icon: Icons.shopping_cart,
+          color: green,
+          title: 'Grocery',
+          date: 'UPI • Today, 10:42 AM',
+          amount: '₹420',
+          impact: '0.8 kg CO₂',
+        ),
+        const TransactionCard(
+          icon: Icons.directions_car,
+          color: blue,
+          title: 'Auto Ride',
+          date: 'UPI • Today, 9:15 AM',
+          amount: '₹120',
+          impact: '1.2 kg CO₂',
+        ),
+        const TransactionCard(
+          icon: Icons.shopping_bag,
+          color: Color(0xFF9062D5),
+          title: 'Online Shopping',
+          date: 'UPI • Yesterday',
+          amount: '₹1,250',
+          impact: '2.5 kg CO₂',
+        ),
+
+        const SizedBox(height: 10),
+
+        Panel(
+          child: Row(
+            children: [
+              const Icon(
+                Icons.lightbulb_outline,
+                color: green,
+                size: 32,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Make a greener choice',
+                      style: TextStyle(
+                        color: navy,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Discover easy sustainable swaps.',
+                      style: TextStyle(color: muted, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onSwaps,
+                icon: const Icon(Icons.arrow_forward, color: blue),
+              ),
+            ],
+          ),
+        ),
+
+        const AppFooter(),
+      ],
+    );
+  }
+}
+
+class StatCard extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String value;
+  final String foot;
+
+  const StatCard({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.value,
+    required this.foot,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 145),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 19,
+            backgroundColor: color.withOpacity(0.12),
+            child: Icon(icon, color: color, size: 21),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: navy,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 5),
+          FittedBox(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: navy,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            foot,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: green, fontSize: 9),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TransactionCard extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String date;
+  final String amount;
+  final String impact;
+
+  const TransactionCard({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.date,
+    required this.amount,
+    required this.impact,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.12),
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: navy,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  date,
+                  style: const TextStyle(color: muted, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                amount,
+                style: const TextStyle(
+                  color: navy,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                impact,
+                style: const TextStyle(color: green, fontSize: 10),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 2. ECO-SWAPS
+
+class SwapsPage extends StatelessWidget {
+  const SwapsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const PageTitle('Eco-Swaps', 'Simple swaps. Big impact.'),
+        Panel(
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.savings_rounded, color: green, size: 35),
+              SizedBox(height: 8),
+              Text(
+                'Your potential monthly impact',
+                style: TextStyle(color: navy, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Up to 42 kg CO₂ saved',
+                style: TextStyle(
+                  color: green,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              Text(
+                'Illustrative estimate based on lifestyle choices.',
+                style: TextStyle(color: muted, fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 15),
+        const SwapCard(
+          icon: Icons.water_drop,
+          title: 'Reusable Water Bottle',
+          description: 'Replace single-use plastic bottles.',
+          saving: '0.5 kg CO₂/day',
+          money: '₹150/month',
+          color: blue,
+        ),
+        const SwapCard(
+          icon: Icons.restaurant,
+          title: 'Plant-Based Meals',
+          description: 'Choose more plant-based meals each week.',
+          saving: '1.8 kg CO₂/day',
+          money: '₹600/month',
+          color: green,
+        ),
+        const SwapCard(
+          icon: Icons.directions_bus,
+          title: 'Public Transport',
+          description: 'Try a bus, train, cycling or walking.',
+          saving: '2.4 kg CO₂/day',
+          money: '₹800/month',
+          color: Color(0xFF9062D5),
+        ),
+        const SwapCard(
+          icon: Icons.lightbulb,
+          title: 'Energy-Efficient LEDs',
+          description: 'Switch to energy-efficient home lighting.',
+          saving: '0.3 kg CO₂/day',
+          money: '₹100/month',
+          color: Color(0xFFEBA32A),
+        ),
+        const SwapC
